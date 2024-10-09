@@ -10,7 +10,7 @@ optimizer_runs = 999999
 evm_version = "london"
 bytecode_hash = "ipfs"
 extra_output_files = ["metadata"]
-eth_rpc_url  = "https://koi-rpc.darwinia.network"
+eth_rpc_url  = "https://crab-rpc.darwinia.network"
 etherscan_api_key = "xxx"
 
 [rpc_endpoints]

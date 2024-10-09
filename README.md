@@ -10,6 +10,17 @@
   -  0x1756B204a72e1B879D9C63b47f31640a57b8c727
 ```
 
+## Crab
+```
+  Delegation Wall:  0x7479798bD9A2972afB4Da5FF9f88bd18Daf546a1
+  Delegation Announcer:  0x05FFdA9C7FD9E30e49e420b0AA6c1772f94e83A7
+  TokenVoting Plugin Setup:  0x879BD4Ca5158cE3b1Fc419D4e7789503923F3d76
+  TokenVoting Plugin Repo:  0x5eB66e31b5Bf40D074aB149643E69ca3fee4Fb7A
+  CrabDAO:  0x663fC3000f0101BF16FDc9F73F02DA6Efa8c5875
+  Installed Plugins:
+  -  0xFF335B8aF2B601d09A499199705Ed3E7bdADa66E
+```
+
 ## Token Voting plugin
 
 This plugin is an adapted version of Aragon's [Token Voting plugin](https://github.com/aragon/osx/tree/v1.3.0/packages/contracts/src/plugins/governance/majority-voting/token). 

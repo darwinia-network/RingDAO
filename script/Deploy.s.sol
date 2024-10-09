@@ -12,6 +12,7 @@ import {MajorityVotingBase} from "@aragon/osx/plugins/governance/majority-voting
 
 import {TokenVotingPluginSetup} from "../src/plugins/token-voting/TokenVotingPluginSetup.sol";
 import {DelegationWall} from "../src/DelegationWall.sol";
+import {DelegateAnnouncer} from "../src/DelegateAnnouncer.sol";
 
 contract Deploy is Script {
     address gRING = 0xdafa555e2785DC8834F4Ea9D1ED88B6049142999;
@@ -22,6 +23,7 @@ contract Deploy is Script {
     address[] pluginAddress;
 
     DelegationWall delegationWall;
+    DelegateAnnouncer delegateAnnouncer;
     TokenVotingPluginSetup tokenVotingPluginSetup;
     PluginRepo tokenVotingPluginRepo;
     DAO ringDAO;
@@ -40,6 +42,7 @@ contract Deploy is Script {
         console2.log("Deploying from:", msg.sender);
 
         delegationWall = new DelegationWall();
+        delegateAnnouncer = new DelegateAnnouncer();
 
         // 1. Deploying the Plugin Setup
         deployPluginSetup();
@@ -70,9 +73,10 @@ contract Deploy is Script {
 
         // 7. Logging the resulting addresses
         console2.log("Delegation Wall: ", address(delegationWall));
+        console2.log("Delegation Announcer: ", address(delegateAnnouncer));
         console2.log("TokenVoting Plugin Setup: ", address(tokenVotingPluginSetup));
         console2.log("TokenVoting Plugin Repo: ", address(tokenVotingPluginRepo));
-        console2.log("Ring DAO: ", address(ringDAO));
+        console2.log("RingDAO: ", address(ringDAO));
         console2.log("Installed Plugins: ");
         for (uint256 i = 0; i < pluginAddress.length; i++) {
             console2.log("- ", pluginAddress[i]);
@@ -83,9 +87,9 @@ contract Deploy is Script {
         if (block.chainid == 701) {
             return 400e18;
         } else if (block.chainid == 44) {
-            revert("TODO");
+            return 20_000_000e18;
         } else if (block.chainid == 46) {
-            return 40000000e18;
+            return 40_000_000e18;
         }
     }
 
@@ -96,16 +100,25 @@ contract Deploy is Script {
 
     function deployPluginRepo() public {
         tokenVotingPluginRepo = PluginRepoFactory(pluginRepoFactory).createPluginRepoWithFirstVersion(
-            string.concat("ringdao-token-voting-", vm.toString(block.timestamp)),
+            string.concat("ringdao-token-voting-", vm.toString(block.chainid)),
             address(tokenVotingPluginSetup),
             maintainer,
-            hex"12", // TODO: Give these actual values on prod
-            hex"34"
+            "QmZYBxHyEd8emirXHQovFDUokGyabyKXBu7hfX7GES6ziT",
+            "QmScsjGhLeAuwhTpqcfY6ya1h1j4LT4hWJFJP3sQjHVyVr"
         );
     }
 
     function getDAOSettings() public view returns (DAOFactory.DAOSettings memory) {
-        return DAOFactory.DAOSettings(address(0), "", string.concat("governance-", vm.toString(block.timestamp)), "");
+        if (block.chainid == 701) {
+            return
+                DAOFactory.DAOSettings(address(0), "", string.concat("governance-", vm.toString(block.timestamp)), "");
+        } else if (block.chainid == 44) {
+            // crab-vote.ring-dao.eth
+            return DAOFactory.DAOSettings(address(0), "", "crab-vote", "");
+            // vote.ring-dao.eth
+        } else if (block.chainid == 46) {
+            return DAOFactory.DAOSettings(address(0), "", "vote", "");
+        }
     }
 
     function getPluginSettings() public view returns (DAOFactory.PluginSettings[] memory pluginSettings) {
@@ -119,8 +132,8 @@ contract Deploy is Script {
                 votingMode: MajorityVotingBase.VotingMode.Standard,
                 supportThreshold: 500_000, // 50%
                 minParticipation: 1, // 0.0001%
-                minDuration: 60 minutes,
-                minProposerVotingPower: 1e18
+                minDuration: 2 weeks,
+                minProposerVotingPower: 1_000_000e18
             }),
             TokenVotingPluginSetup.TokenSettings({addr: gRING})
         );
